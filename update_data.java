@@ -13,7 +13,7 @@ import java.util.Set;
 public class update_data {
     Map<String,Integer> college_collegeid =new HashMap<>();
     Map<String,Integer> classid_classname_courseid=new HashMap<>();
-    Set<String> courseID=new HashSet<>();
+
 public Connection connection=null;
 
 
