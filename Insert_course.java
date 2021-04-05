@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -48,22 +46,24 @@ public class Insert_course implements Runnable {
        ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(insert_course);
         long count=0;
-        try (BufferedReader bufferedReader=new BufferedReader(new FileReader("course.txt"))){
+        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("course.sql"));
+        try (BufferedReader bufferedReader=new BufferedReader(new FileReader("course_message.csv"))){
             try{
                 while ((line=bufferedReader.readLine())!=null&&!line.equals("")){
-                    each=line.split(";");
-
-                    preparedStatement.setObject(1,each[0]);
+                    each=line.split(",");
+                    preparedStatement.setObject(1,each[0].trim());
                     preparedStatement.setObject(2,each[1]);
                     preparedStatement.setFloat(3,Float.parseFloat(each[2]));
                     preparedStatement.setInt(4,Integer.parseInt(each[3]));
                     preparedStatement.setObject(5,each[4]);
+                    bufferedWriter.write(preparedStatement.toString()+";");
+                    bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
-                    if (count%10000==0){
+                    if (count%200==0){
+                        bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
-
                         preparedStatement.clearBatch();
                     }
                 }
@@ -79,6 +79,8 @@ public class Insert_course implements Runnable {
       //  connection.commit();
       //this.preparedStatement.close();
        //this.statement.close();
+        bufferedWriter.flush();
+        bufferedWriter.close();
         ConnectionManager.commitTransaction(connection);
         ConnectionManager.close(preparedStatement);
         ConnectionManager.closeConnection();

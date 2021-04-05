@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,25 +19,6 @@ CountDownLatch latch=null;
     ResultSet resultSet=null;
 public Insert_college_student(){}
 public Insert_college_student(CountDownLatch a){latch=a;}
-  /*  public void getConnection() throws Exception {
-        try {
-            Class.forName("org.postgresql.Driver");
-
-        } catch (Exception e) {
-            System.err.println("Cannot find the PostgreSQL driver. Check CLASSPATH.");
-            System.exit(1);
-        }
-
-        try {
-            String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbname;
-            connection = DriverManager.getConnection(url, user, pwd);
-
-        } catch (SQLException e) {
-            System.err.println("Database connection failed");
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-    }*/
     public void insert_college() throws Exception {
         String line=null;
         String each[];
@@ -53,6 +31,7 @@ public Insert_college_student(CountDownLatch a){latch=a;}
        // connection.setAutoCommit(false);
         ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(insert_college);
+        BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("college.sql"));
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader("select_course.csv"))) {
             try{
                 while ((line = bufferedReader.readLine()) != null){
@@ -67,12 +46,13 @@ public Insert_college_student(CountDownLatch a){latch=a;}
                         preparedStatement.setInt(1,id);
                         preparedStatement.setObject(2,cname);
                         preparedStatement.setObject(3,ename);
+                       bufferedWriter.write(preparedStatement.toString()+";");
+                       bufferedWriter.newLine();
                         preparedStatement.addBatch();
                         if(id%10000==0){ //1万次一条，或者最后一次进行提交。
                             preparedStatement.executeBatch();
                             preparedStatement.clearBatch(); /**清除缓存*/
                         }
-
                     }
                 }
             }catch (Exception e){
@@ -88,6 +68,11 @@ public Insert_college_student(CountDownLatch a){latch=a;}
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+
+        bufferedWriter.flush();
+        bufferedWriter.close();
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         //connection.commit();
@@ -109,6 +94,8 @@ public Insert_college_student(CountDownLatch a){latch=a;}
        // connection.setAutoCommit(false);
         //ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(insert_student);
+
+        BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("student.sql"));
         long count=0;
         try (BufferedReader bufferedReader=new BufferedReader(new FileReader("select_course.csv"))){
             try{
@@ -123,10 +110,13 @@ public Insert_college_student(CountDownLatch a){latch=a;}
                     preparedStatement.setObject(2,name);
                     preparedStatement.setObject(3,sex);
                     preparedStatement.setInt(4,college_id);
+                    bufferedWriter.write(preparedStatement.toString()+";");
+                    bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
 
                     if (count%500==0){
+                        bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
 
@@ -140,6 +130,10 @@ public Insert_college_student(CountDownLatch a){latch=a;}
         }catch (IOException e){
             System.out.println("file not find");
         }
+        bufferedWriter.flush();bufferedWriter.close();
+
+
+
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         //connection.commit();

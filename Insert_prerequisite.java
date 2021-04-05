@@ -1,6 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import com.sun.javafx.scene.control.skin.FXVK;
+
+import java.io.*;
 import java.sql.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -20,51 +20,51 @@ public Insert_prerequisite(){}
     public Insert_prerequisite(CountDownLatch a){
     latch=a;
     }
-  /*  public void getConnection() throws Exception {
-        try {
-            Class.forName("org.postgresql.Driver");
 
-        } catch (Exception e) {
-            System.err.println("Cannot find the PostgreSQL driver. Check CLASSPATH.");
-            System.exit(1);
-        }
-
-        try {
-            String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbname;
-            connection = DriverManager.getConnection(url, user, pwd);
-
-        } catch (SQLException e) {
-            System.err.println("Database connection failed");
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-    }*/
     public void insert_prerequisite()  throws  Exception {
         //getConnection();
        Connection connection= ConnectionManager.getConnection();
         String line=null;
-        String each[];
+        String each[]=null;
         long count=0;
-        String prerequisite="insert into prerequisite(courseID,prerequisite)  values(?,?);";
-       // connection.setAutoCommit(false);
+        String prerequisite="insert into prerequisite(courseID,prerequisiteID1,prerequisiteID2,prerequisiteID3,prerequisiteID4,pre_id)  values(?,?,?,?,?,?);";
+        connection.setAutoCommit(false);
         ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(prerequisite);
-        try(BufferedReader bufferedReader=new BufferedReader(new FileReader("prerequisite.txt"))){
+        int now_id=0;
+        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("prerequisite.sql"));
+        try(BufferedReader bufferedReader=new BufferedReader(new FileReader("prerequisite.csv"))){
             try{
                 while (((line = bufferedReader.readLine()) != null)&&!line.equals("")){
-                    each=line.split(";");
-                    preparedStatement.setObject(1,each[0]);
-                    preparedStatement.setObject(2,each[1]);
+                    now_id++;
+                    each=line.split(",",-1);
+                    System.out.println(each.length);
+
+                    preparedStatement.setObject(1,each[0].trim());
+                    for (int i=1;i<5;i++){
+                      if (each[i].equals("")){
+                          preparedStatement.setNull(i+1,Types.LONGVARCHAR);
+                      }else {
+                          preparedStatement.setObject(i+1,each[i]);
+                      }
+                    }
+                   preparedStatement.setInt(6,now_id);
+                    bufferedWriter.write(preparedStatement.toString()+";");
+                    bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
                     if (count%500==0){
+                        bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
                         preparedStatement.clearBatch();
                     }
+
                 }
             }catch (Exception e){
                 System.out.println("this is the prerequisite problem ");
+                e.printStackTrace();
+                /*System.out.println(each[0]+" "+each[1]);*/
             }
 
 
@@ -72,6 +72,8 @@ public Insert_prerequisite(){}
         }catch (FileNotFoundException e) {
             System.out.println("file not find ");
         }
+        bufferedWriter.flush();
+        bufferedWriter.close();
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         ConnectionManager.commitTransaction(connection);

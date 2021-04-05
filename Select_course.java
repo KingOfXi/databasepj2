@@ -1,8 +1,6 @@
 import org.postgresql.util.PSQLException;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -54,23 +52,25 @@ public  Select_course(){}
         preparedStatement=connection.prepareStatement(insert_select_course);
         long count=0;
         int a=0;
+        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("select_course.sql"));
         try (BufferedReader bufferedReader=new BufferedReader(new FileReader("select_course.csv"))){
             while ((line=bufferedReader.readLine())!=null&&!line.equals("")){
                 try{
                     each=line.split(",");
 
                     Set<String> same=new HashSet<>();
+                    // n 没有加  trim
                     for (int i=4;i<each.length;i++){
-                        if (!same.contains(each[i])){
-                            same.add(each[i]);
+                        if (!same.contains(each[i].trim())){
+                            same.add(each[i].trim());
                             preparedStatement.setInt(1,Integer.parseInt(each[3]));
-                            preparedStatement.setObject(2,each[i]);
+                            preparedStatement.setObject(2,each[i].trim());
+bufferedWriter.write(preparedStatement.toString()+";");
+bufferedWriter.newLine();
                             preparedStatement.addBatch();
                             count++;
                             if (count%1000==0){
-                               a++;
-                               if (a==50){a=0;
-                                   System.out.println("h");}
+                              bufferedWriter.flush();
                                 count=0;
                                 preparedStatement.executeBatch();
                                 preparedStatement.clearBatch();
@@ -90,6 +90,9 @@ public  Select_course(){}
         }catch (FileNotFoundException e){
             System.out.println("file not find");
         }
+bufferedWriter.flush();bufferedWriter.close();
+
+
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         ConnectionManager.commitTransaction(connection);

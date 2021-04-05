@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,53 +21,37 @@ public class Insert_class_schedule implements Runnable {
     ResultSet resultSet=null;
 public Insert_class_schedule(){}
     public Insert_class_schedule(CountDownLatch a){latch=a;}
-    /*public void getConnection() throws Exception {
-        try {
-            Class.forName("org.postgresql.Driver");
 
-        } catch (Exception e) {
-            System.err.println("Cannot find the PostgreSQL driver. Check CLASSPATH.");
-            System.exit(1);
-        }
-
-        try {
-            String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbname;
-            connection = DriverManager.getConnection(url, user, pwd);
-
-        } catch (SQLException e) {
-            System.err.println("Database connection failed");
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-    }*/
     public void insert_class() throws  Exception {
         String line=null;
         String each[];
         int class_id=0;
         long count=0;
-        //getConnection();
       connection= ConnectionManager.getConnection();
-       // connection.setAutoCommit(false);
         ConnectionManager.beginTransaction(connection);
-        String class_stu="insert into class(class_id ,class_name ,courseID ,capacity ,teacher) values(?,?,?,?,?);";
+
+        String class_stu="insert into class(class_id ,class_name ,courseID ,capacity ) values(?,?,?,?);";
         preparedStatement =connection.prepareStatement(class_stu);
+        BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("class.sql"));
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader("class.txt"))) {
             while (((line = bufferedReader.readLine()) != null)&&!line.equals("")){
                 try{
                     each=line.split(";");
                     class_id++;
-                    String temp=each[0]+";"+each[1];
+                    String temp=each[0]+";"+each[1].trim();
 
                     classid_classname_courseid.put(temp,class_id);
-
                     preparedStatement.setInt(1,class_id);
                     preparedStatement.setObject(2,each[0]);
-                    preparedStatement.setObject(3,each[1]);
+                    preparedStatement.setObject(3,each[1].trim());
                     preparedStatement.setInt(4,Integer.parseInt(each[2]));
-                    preparedStatement.setObject(5,each[3]);
+                    bufferedWriter.write(preparedStatement.toString()+";");
+                    bufferedWriter.newLine();
+                 //   preparedStatement.setObject(5,each[3]);
                     preparedStatement.addBatch();
                     count++;
                     if (count%500==0){
+                        bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
                         preparedStatement.clearBatch();
@@ -83,47 +65,93 @@ public Insert_class_schedule(){}
         } catch (FileNotFoundException e) {
             System.out.println("file not find ");
         }
+
+
+        bufferedWriter.flush();bufferedWriter.close();
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
-        //connection.commit();
-        //preparedStatement.close();
-        //statement.close();
+
         ConnectionManager.commitTransaction(connection);
         ConnectionManager.close(preparedStatement);
-        //ConnectionManager.closeConnection();
+
+        String teacher ="insert into teachers (class_id,teacher) values(?,?);";
+        preparedStatement =connection.prepareStatement(teacher);
+
+        int now_class_id=0;//each[3] is teacher
+        String each_temp[]=null;
+        BufferedWriter bufferedWriter1=new BufferedWriter(new FileWriter("teachers.sql"));
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader("class.txt"))){
+            while (((line = bufferedReader.readLine()) != null)&&!line.equals("")){
+                try{
+                    each=line.split(";");
+                    String temp=each[0]+";"+each[1].trim();
+
+                   now_class_id=  classid_classname_courseid.get(temp);
+                   each_temp=each[3].split(",");
+                   for (int i=0;i<each_temp.length;i++){
+                       preparedStatement.setInt(1,now_class_id);
+                       preparedStatement.setObject(2,each_temp[i]);
+                       bufferedWriter1.write(preparedStatement.toString()+";");
+                       bufferedWriter1.newLine();
+                       preparedStatement.addBatch();
+                       count++;
+                       if (count%500==0){
+                           bufferedWriter1.flush();
+                           count=0;
+                           preparedStatement.executeBatch();
+                           preparedStatement.clearBatch();
+                       }
+                   }
+
+                }catch (Exception e){
+                    System.out.println("this is the teacher problem");
+                }
+            }
+        }catch (FileNotFoundException e) {
+            System.out.println("file not find ");
+        }
+        bufferedWriter1.flush();bufferedWriter1.close();
+        preparedStatement.executeBatch();
+        preparedStatement.clearBatch();
+
+        ConnectionManager.commitTransaction(connection);
+        ConnectionManager.close(preparedStatement);
+
     }
     public void insert_shedule() throws  Exception {
         String line=null;
-        String each[];
+        String each[]=null;
         int class_id=0;
         long count=0;
         String temp=null;
-       // getConnection();
-       // ConnectionManager.getConnection();
+
         String schedule="insert into schedule(class_id  ,weekday , class_time ,location ,weeklist)  values(?,?,?,?,?); ";
-        //connection.setAutoCommit(false);
         preparedStatement=connection.prepareStatement(schedule);
+        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("schedule.sql"));
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader("schedule.txt"))) {
             while (((line = bufferedReader.readLine()) != null)&&!line.equals("")){
                 try{
                     each=line.split(";");
 
-                    temp=each[0]+";"+each[1];
+                    temp=each[0]+";"+each[1].trim();
                     class_id=classid_classname_courseid.get(temp);
                     preparedStatement.setInt(1,class_id);
                     preparedStatement.setInt(2,Integer.parseInt(each[2]));
                     preparedStatement.setObject(3,each[3]);
                     preparedStatement.setObject(4,each[4].trim());
                     preparedStatement.setObject(5,each[5]);
+                    bufferedWriter.write(preparedStatement.toString()+";");
+                    bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
                     if (count%500==0){
+                        bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
                         preparedStatement.clearBatch();
                     }
                 }catch ( Exception e){
-                    System.out.println("this is the schedule problem ");
+                    System.out.println("this is the schedule problem "+each[2]);
                 }
 
 
@@ -134,6 +162,11 @@ public Insert_class_schedule(){}
         } catch (FileNotFoundException e) {
             System.out.println("file not find ");
         }
+        bufferedWriter.flush();bufferedWriter.close();
+
+
+
+
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         //connection.commit();
