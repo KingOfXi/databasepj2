@@ -7,7 +7,8 @@ import java.util.HashMap;
 
 public class Table_course {
 private ArrayList<unit_course> arrayList=new ArrayList<>();
-private HashMap<String,String> hashMap=new HashMap<>();
+public static HashMap<String,String> hashMap=new HashMap<>();
+public static HashMap<String ,Float> hashMap2=new HashMap<>();
     public void add_data(){
         String line=null;
         String each[]=null;

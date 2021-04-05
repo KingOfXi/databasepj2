@@ -47,14 +47,27 @@ Thread.sleep(10000);
         System.out.println("程序运行时间：" + (endTime - startTime) + "ms");*/
         Table_course table_course=new Table_course();
         table_course.add_data();
+
+        Table_class table_class=new Table_class();
+        table_class.add_data();
+
+        Table_student table_student=new Table_student();
+        table_student.add_data();
+
+        Table_college table_college=new Table_college();
+        table_college.add_data();
+
+        Table_select_course table_select_course=new Table_select_course();
+        table_select_course.add_data();
+
+
         long startTime_selectcoursebyid =System.nanoTime();
         System.out.println(table_course.selectCourseByIDBF("ESS312"));
 long endTime_selectcoursebyid =System.nanoTime();
         System.out.println(((endTime_selectcoursebyid-startTime_selectcoursebyid)/(double)1000000));
         //0.3386ms  时间
 
-Table_class table_class=new Table_class();
-table_class.add_data();
+
 
         long startTime_selectClassByCourseID =System.nanoTime();
         table_class.selectClassByCourseID("IPE105");
@@ -78,13 +91,24 @@ table_class.add_data();
 
 
 
-        Table_student table_student=new Table_student();
-        table_student.add_data();
+
 
         long startTime_selectStudentBySID=System.nanoTime();
         table_student.selectStudentBySID(13326182);
         long endTime_selectStudentBySID=System.nanoTime();
         System.out.println((endTime_selectStudentBySID-startTime_selectStudentBySID)/(double)1000000);
+
+
+        long startTime_printCourseInformation=System.nanoTime();
+        table_select_course.printCourseInformation(13326182);
+        long endTime_printCourseInformation=System.nanoTime();
+        System.out.println((endTime_printCourseInformation-startTime_printCourseInformation)/(double)1000000);
+
+
+long startTime_calculateCredit=System.nanoTime();
+table_select_course.calculateCredit(13326182);
+long endTime_calculateCredit =System.nanoTime();
+        System.out.println((endTime_calculateCredit-startTime_calculateCredit)/(double)1000000);
 
     }
 

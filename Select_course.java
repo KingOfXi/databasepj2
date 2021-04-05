@@ -52,7 +52,7 @@ public  Select_course(){}
         preparedStatement=connection.prepareStatement(insert_select_course);
         long count=0;
         int a=0;
-        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("select_course.sql"));
+      //  BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("select_course.sql"));
         try (BufferedReader bufferedReader=new BufferedReader(new FileReader("select_course.csv"))){
             while ((line=bufferedReader.readLine())!=null&&!line.equals("")){
                 try{
@@ -65,12 +65,12 @@ public  Select_course(){}
                             same.add(each[i].trim());
                             preparedStatement.setInt(1,Integer.parseInt(each[3]));
                             preparedStatement.setObject(2,each[i].trim());
-bufferedWriter.write(preparedStatement.toString()+";");
-bufferedWriter.newLine();
+/*bufferedWriter.write(preparedStatement.toString()+";");
+bufferedWriter.newLine();*/
                             preparedStatement.addBatch();
                             count++;
                             if (count%1000==0){
-                              bufferedWriter.flush();
+                            //  bufferedWriter.flush();
                                 count=0;
                                 preparedStatement.executeBatch();
                                 preparedStatement.clearBatch();
@@ -90,7 +90,7 @@ bufferedWriter.newLine();
         }catch (FileNotFoundException e){
             System.out.println("file not find");
         }
-bufferedWriter.flush();bufferedWriter.close();
+        //bufferedWriter.flush();bufferedWriter.close();
 
 
         preparedStatement.executeBatch();
