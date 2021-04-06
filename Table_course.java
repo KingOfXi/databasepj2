@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Table_course {
-private ArrayList<unit_course> arrayList=new ArrayList<>();
+public static ArrayList<unit_course> course_arrayList=new ArrayList<>();
 public static HashMap<String,String> hashMap=new HashMap<>();
 public static HashMap<String ,Float> hashMap2=new HashMap<>();
     public void add_data(){
@@ -17,8 +17,9 @@ public static HashMap<String ,Float> hashMap2=new HashMap<>();
             try{
                 while ((line = bufferedReader.readLine()) != null&&!line.equals("")){
                     each=line.split(",");
-arrayList.add(new unit_course(each[0],each[1],Float.parseFloat(each[2]),Integer.parseInt(each[3]),each[4]));
+                    course_arrayList.add(new unit_course(each[0],each[1],Float.parseFloat(each[2]),Integer.parseInt(each[3]),each[4]));
 hashMap.put(each[0],each[1]+" "+each[2]+" "+each[3]+" "+each[4]);
+hashMap2.put(each[0],Float.parseFloat(each[2]));
                 }
             }catch (Exception e){
                 //System.out.println("this is college problem");
@@ -38,11 +39,11 @@ hashMap.put(each[0],each[1]+" "+each[2]+" "+each[3]+" "+each[4]);
     }
     public void selectCourseByDept(String Dept){
         int k=0;
-        for (int i=0;i<arrayList.size();i++){
-            if (arrayList.get(i).dept.equals(Dept)){
+        for (int i=0;i<course_arrayList.size();i++){
+            if (course_arrayList.get(i).dept.equals(Dept)){
                 k++;
-                System.out.println(arrayList.get(i).getCouseID()+" "+arrayList.get(i).getCourseName()+" "
-                +arrayList.get(i).getCredit()+" "+arrayList.get(i).getHour()+" "+arrayList.get(i).dept);
+                System.out.println(course_arrayList.get(i).getCouseID()+" "+course_arrayList.get(i).getCourseName()+" "
+                +course_arrayList.get(i).getCredit()+" "+course_arrayList.get(i).getHour()+" "+course_arrayList.get(i).dept);
             }
         }
         if (k==0){

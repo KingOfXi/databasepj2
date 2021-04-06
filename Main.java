@@ -44,7 +44,9 @@ Thread.sleep(10000);
 
 
         long endTime = System.currentTimeMillis();
-        System.out.println("程序运行时间：" + (endTime - startTime) + "ms");*/
+        System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
+        */
+
         Table_course table_course=new Table_course();
         table_course.add_data();
 
@@ -58,7 +60,7 @@ Thread.sleep(10000);
         table_college.add_data();
 
         Table_select_course table_select_course=new Table_select_course();
-        table_select_course.add_data();
+     //   table_select_course.add_data();
 
 
         long startTime_selectcoursebyid =System.nanoTime();
@@ -103,6 +105,8 @@ long endTime_selectcoursebyid =System.nanoTime();
         table_select_course.printCourseInformation(13326182);
         long endTime_printCourseInformation=System.nanoTime();
         System.out.println((endTime_printCourseInformation-startTime_printCourseInformation)/(double)1000000);
+
+
 
 
 long startTime_calculateCredit=System.nanoTime();
