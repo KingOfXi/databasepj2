@@ -46,7 +46,7 @@ public class Insert_course implements Runnable {
        ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(insert_course);
         long count=0;
-        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("course.sql"));
+      //  BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("course.sql"));
         try (BufferedReader bufferedReader=new BufferedReader(new FileReader("course_message.csv"))){
             try{
                 while ((line=bufferedReader.readLine())!=null&&!line.equals("")){
@@ -56,12 +56,12 @@ public class Insert_course implements Runnable {
                     preparedStatement.setFloat(3,Float.parseFloat(each[2]));
                     preparedStatement.setInt(4,Integer.parseInt(each[3]));
                     preparedStatement.setObject(5,each[4]);
-                    bufferedWriter.write(preparedStatement.toString()+";");
-                    bufferedWriter.newLine();
+               //     bufferedWriter.write(preparedStatement.toString()+";");
+               //     bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
                     if (count%200==0){
-                        bufferedWriter.flush();
+                  //      bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
                         preparedStatement.clearBatch();
@@ -79,8 +79,8 @@ public class Insert_course implements Runnable {
       //  connection.commit();
       //this.preparedStatement.close();
        //this.statement.close();
-        bufferedWriter.flush();
-        bufferedWriter.close();
+     //   bufferedWriter.flush();
+     //   bufferedWriter.close();
         ConnectionManager.commitTransaction(connection);
         ConnectionManager.close(preparedStatement);
         ConnectionManager.closeConnection();

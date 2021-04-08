@@ -31,7 +31,7 @@ public Insert_college_student(CountDownLatch a){latch=a;}
        // connection.setAutoCommit(false);
         ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(insert_college);
-        BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("college.sql"));
+       // BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("college.sql"));
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader("select_course.csv"))) {
             try{
                 while ((line = bufferedReader.readLine()) != null){
@@ -46,8 +46,8 @@ public Insert_college_student(CountDownLatch a){latch=a;}
                         preparedStatement.setInt(1,id);
                         preparedStatement.setObject(2,cname);
                         preparedStatement.setObject(3,ename);
-                       bufferedWriter.write(preparedStatement.toString()+";");
-                       bufferedWriter.newLine();
+                       //bufferedWriter.write(preparedStatement.toString()+";");
+                       //bufferedWriter.newLine();
                         preparedStatement.addBatch();
                         if(id%10000==0){ //1万次一条，或者最后一次进行提交。
                             preparedStatement.executeBatch();
@@ -71,8 +71,8 @@ public Insert_college_student(CountDownLatch a){latch=a;}
 
 
 
-        bufferedWriter.flush();
-        bufferedWriter.close();
+      //  bufferedWriter.flush();
+      //  bufferedWriter.close();
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         //connection.commit();
@@ -95,7 +95,7 @@ public Insert_college_student(CountDownLatch a){latch=a;}
         //ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(insert_student);
 
-        BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("student.sql"));
+       // BufferedWriter bufferedWriter=new BufferedWriter(new FileWriter("student.sql"));
         long count=0;
         try (BufferedReader bufferedReader=new BufferedReader(new FileReader("select_course.csv"))){
             try{
@@ -110,13 +110,13 @@ public Insert_college_student(CountDownLatch a){latch=a;}
                     preparedStatement.setObject(2,name);
                     preparedStatement.setObject(3,sex);
                     preparedStatement.setInt(4,college_id);
-                    bufferedWriter.write(preparedStatement.toString()+";");
-                    bufferedWriter.newLine();
+                  //  bufferedWriter.write(preparedStatement.toString()+";");
+                 //   bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
 
                     if (count%500==0){
-                        bufferedWriter.flush();
+                     //   bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
 
@@ -130,7 +130,7 @@ public Insert_college_student(CountDownLatch a){latch=a;}
         }catch (IOException e){
             System.out.println("file not find");
         }
-        bufferedWriter.flush();bufferedWriter.close();
+       // bufferedWriter.flush();bufferedWriter.close();
 
 
 

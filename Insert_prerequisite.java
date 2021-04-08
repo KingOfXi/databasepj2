@@ -32,7 +32,7 @@ public Insert_prerequisite(){}
         ConnectionManager.beginTransaction(connection);
         preparedStatement=connection.prepareStatement(prerequisite);
         int now_id=0;
-        BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("prerequisite.sql"));
+    //    BufferedWriter bufferedWriter =new BufferedWriter(new FileWriter("prerequisite.sql"));
         try(BufferedReader bufferedReader=new BufferedReader(new FileReader("prerequisite.csv"))){
             try{
                 while (((line = bufferedReader.readLine()) != null)&&!line.equals("")){
@@ -49,12 +49,12 @@ public Insert_prerequisite(){}
                       }
                     }
                    preparedStatement.setInt(6,now_id);
-                    bufferedWriter.write(preparedStatement.toString()+";");
-                    bufferedWriter.newLine();
+                //    bufferedWriter.write(preparedStatement.toString()+";");
+                //    bufferedWriter.newLine();
                     preparedStatement.addBatch();
                     count++;
                     if (count%500==0){
-                        bufferedWriter.flush();
+                 //       bufferedWriter.flush();
                         count=0;
                         preparedStatement.executeBatch();
                         preparedStatement.clearBatch();
@@ -72,8 +72,8 @@ public Insert_prerequisite(){}
         }catch (FileNotFoundException e) {
             System.out.println("file not find ");
         }
-        bufferedWriter.flush();
-        bufferedWriter.close();
+      //  bufferedWriter.flush();
+      //  bufferedWriter.close();
         preparedStatement.executeBatch();
         preparedStatement.clearBatch();
         ConnectionManager.commitTransaction(connection);

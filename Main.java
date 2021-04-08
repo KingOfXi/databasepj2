@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         //import data into database
-       /* ExecutorService service= Executors.newFixedThreadPool(8);
+        ExecutorService service= Executors.newFixedThreadPool(8);
         long startTime = System.currentTimeMillis();
         Create_tables tables =new Create_tables();
         tables.create_tables();
@@ -45,9 +45,8 @@ Thread.sleep(10000);
 
         long endTime = System.currentTimeMillis();
         System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
-        */
 
-        Table_course table_course=new Table_course();
+      /*  Table_course table_course=new Table_course();
         table_course.add_data();
 
         Table_class table_class=new Table_class();
@@ -112,7 +111,7 @@ long endTime_selectcoursebyid =System.nanoTime();
 long startTime_calculateCredit=System.nanoTime();
 table_select_course.calculateCredit(13326182);
 long endTime_calculateCredit =System.nanoTime();
-        System.out.println((endTime_calculateCredit-startTime_calculateCredit)/(double)1000000);
+        System.out.println((endTime_calculateCredit-startTime_calculateCredit)/(double)1000000);*/
 
     }
 
